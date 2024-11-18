@@ -5,6 +5,7 @@ import os, sys
 def create_object_from_db(to_return, column_name, callback, exam=None, group=None):
     path = os.path.join(os.path.dirname(sys.argv[0]), 'db.xlsx')
     df = pd.read_excel(path)
+
     list = df[column_name].drop_duplicates().tolist()
 
     if (to_return == 'keyboard' and column_name=='Время'):
@@ -12,6 +13,14 @@ def create_object_from_db(to_return, column_name, callback, exam=None, group=Non
         keyboard = InlineKeyboardMarkup()
         for option in list.itertuples(index=False, name=None):
             keyboard.row(InlineKeyboardButton(str(option[2]), callback_data=callback+'_'+str(option[2])))
+        keyboard.row(InlineKeyboardButton('Домой', callback_data='start'))
+        return keyboard
+    
+    if (to_return == 'keyboard' and column_name=='Экзамен'):
+        list = df.query(f"Группа == '{group}'").drop_duplicates(subset=['Экзамен'])
+        keyboard = InlineKeyboardMarkup()
+        for option in list.itertuples(index=False, name=None):
+            keyboard.row(InlineKeyboardButton(str(option[1]), callback_data=callback+'_'+str(option[1])))
         keyboard.row(InlineKeyboardButton('Домой', callback_data='start'))
         return keyboard
 
@@ -68,11 +77,14 @@ def final_record(user):
 
 def watch_students(group,exam):
     path = os.path.join(os.path.dirname(sys.argv[0]), 'final_record', f'{group}.xlsx')
-    df = pd.read_excel(path)
-    df = df.query(f"Экзамен == '{exam}'").sort_values(by='ФИО')
-    is_df_empy = df.empty
-    df = df.to_string(index=False)
-    if is_df_empy == True:
-        return 'Пока никто не записался на экзамен :_('
-    else:
-        return df
+    try:
+        df = pd.read_excel(path)
+        df = df.query(f"Экзамен == '{exam}'").sort_values(by='ФИО')
+        is_df_empy = df.empty
+        df = df.to_string(index=False)
+        if is_df_empy == True:
+            return 'Пока никто не записался на экзамен :_('
+        else:
+            return df
+    except FileNotFoundError:
+         return 'Пока никто не записался на экзамен :_('

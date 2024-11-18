@@ -52,7 +52,8 @@ def callback_query_main(call):
         users[user_id].append(substring)
         keyboard_record22 = exten.create_object_from_db(to_return='keyboard', 
                                                         column_name='Экзамен', 
-                                                        callback='teach_watch_group')
+                                                        callback='teach_watch_group',
+                                                        group=users[user_id][0])
         bot.edit_message_text(chat_id=call.message.chat.id, 
                                 message_id=call.message.message_id, 
                                 text=f"Вы выбрали группу {users[user_id][0]}. Выберите экзамен для просмотра", 
@@ -73,7 +74,8 @@ def callback_query_main(call):
         users[user_id].append(substring)
         keyboard_record3 = exten.create_object_from_db(to_return='keyboard', 
                                                        column_name='Экзамен', 
-                                                       callback='exam_time_rec')
+                                                       callback='exam_time_rec',
+                                                       group=users[user_id][1])
         bot.edit_message_text(chat_id=call.message.chat.id, 
                                 message_id=call.message.message_id, 
                                 text=f"Ты выбрал группу {users[user_id][1]}. Выбери на какой экзамен записаться", 
